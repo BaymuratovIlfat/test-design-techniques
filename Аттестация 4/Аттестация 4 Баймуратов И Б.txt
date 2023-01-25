@@ -1,0 +1,114 @@
+								Аттестация №4
+
+								Задание №1
+
+•	Найти информацию о всех контрактах, связанных с сотрудниками департамента «Logistic». Вывести: contract_id, employee_name
+
+Скрипт запроса:
+
+SELECT employees.name, executor.contract_id FROM department
+	JOIN employees ON department.id = employees.department_id
+	JOIN executor ON executor.tab_no = employees.id
+	WHERE department.name = 'Logistic'
+
+								Задание №2
+
+•	Найти среднюю стоимость контрактов, заключенные сотрудником Ivan Ivanov. Вывести: среднее значение amount
+
+Скрипт запроса:
+
+SELECT ROUND(AVG(contract.amount), 2) FROM employees
+	JOIN executor ON executor.tab_no = employees.id
+	JOIN contract ON executor.contract_id = contract.id
+	WHERE employees.name = 'Ivan Ivanov'
+
+								Задание №3
+
+•	Найти самую часто встречающуюся локацию среди всех заказчиков. Вывести: location, count
+
+Скрипт запроса:
+
+SELECT customer.location, COUNT(customer.location) FROM customer
+GROUP BY customer.location
+HAVING COUNT(customer.location) > 0
+ORDER BY COUNT(customer.location)
+DESC
+LIMIT 1
+
+								Задание №4
+
+•	Найти контракты одинаковой стоимости. Вывести count, amount
+
+Скрипт запроса:
+
+SELECT COUNT(contract.amount), contract.amount FROM contract
+GROUP BY contract.amount
+
+								Задание №5
+
+•	Найти заказчика с наименьшей средней стоимостью контрактов. Вывести customer_name, среднее значение amount
+
+Скрипт запроса:
+
+SELECT customer.customer_name, ROUND(AVG(contract.amount), 2) FROM customer
+	JOIN contract ON contract.customer_id = customer.id
+	GROUP BY customer.customer_name
+	HAVING COUNT(customer.customer_name) > 0
+	ORDER BY ROUND(AVG(contract.amount), 2)
+	ASC
+	LIMIT 1
+
+								Задание №6
+
+•	Найти отдел, заключивший контрактов на наибольшую сумму. Вывести: department_name, sum
+
+Скрипт запроса: 
+
+SELECT department.name, SUM(contract.amount) FROM department
+	JOIN employees ON department.id = employees.department_id
+	JOIN executor ON executor.tab_no = employees.id
+	JOIN contract ON executor.contract_id = contract.id
+	GROUP BY department.name
+	HAVING COUNT(department.name) > 0
+	ORDER BY SUM(contract.amount)
+	DESC
+	LIMIT 1
+
+
+							Свои дополнительные скрипты
+
+							Дополнительное задание №1
+
+Добавить данные в таблицу "contract"
+
+Добавляем 26 контракт без цены контракта.
+Скрипт запроса:
+
+INSERT INTO public.contract(
+  id, customer_id, contract_date)
+  VALUES(26,1,'10.05.12');
+
+							Дополнительное задание №2
+
+Сделать RIGHT/LEFT JOIN запрос.
+
+Создаю LEFT JOIN запрос для вывода неполных данных таблицы "contract":
+Скрипт запроса:
+
+SELECT contract.id, contract.customer_id, contract.contract_date, contract.amount  FROM contract 
+LEFT JOIN customer ON contract.customer_id = customer.id
+
+
+							Дополнительное задание №3
+Показать сотрудников у которых средняя стоимость контрактов ниже 80000. Вывести отделы этих сотрудников. Отсортировать по возрастанию сред. стоимости контрактов.
+
+Скрипт запроса:
+
+SELECT department.name, employees.name, ROUND(AVG(contract.amount),2) FROM department
+	JOIN employees ON department.id = employees.department_id
+	JOIN executor ON executor.tab_no = employees.id
+	JOIN contract ON executor.contract_id = contract.id
+	GROUP BY department.name, employees.name
+	HAVING AVG(contract.amount) < 80000
+	ORDER BY AVG(contract.amount)
+	ASC
